@@ -73,13 +73,13 @@ while True:
                     if longitud1 < 19 and longitud2 < 19 and longitud3 > 80 and longitud3 < 95 and longitud4 < 5:
                         cv2.putText(frame, "Persona Enojada", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
                     # Persona Feliz
-                    elif longitud1 > 20 and longitud1 < 30 and longitud2 > 20 and longitud2 < 30 and longitud3 > 90 and longitud3 < 110 and longitud4 > 10 and longitud4 < 20:
+                    elif longitud1 > 20 and longitud1 < 30 and longitud2 > 20 and longitud2 < 30 and longitud3 > 109 and longitud4 > 10 and longitud4 < 20:
                         cv2.putText(frame, "Persona Feliz", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
                     # Persona Sorprendida
-                    elif longitud1 > 35 and longitud2 > 35 and longitud3 > 80 and longitud3 < 90 and longitud4 > 20:
+                    elif longitud1 > 35 and longitud2 > 35 and longitud3 > 85 and longitud3 < 90 and longitud4 > 20:
                         cv2.putText(frame, "Persona Sorprendida", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 3)
                     # Persona Triste
-                    elif longitud1 > 20 and longitud1 < 35 and longitud2 > 25 and longitud2 < 35 and longitud3 > 80 and longitud3 < 110 and longitud4 < 5:
+                    elif longitud1 > 20 and longitud1 < 35 and longitud2 > 20 and longitud2 < 35 and longitud3 > 90 and longitud3 < 95 and longitud4 < 5:
                         cv2.putText(frame, "Persona Triste", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3)
                         
     cv2.imshow("Intensamente 2D", frame)
