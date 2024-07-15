@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
 import math
+from PIL import Image
+import os
 
 # Realizar la captura de video
 cap = cv2.VideoCapture(1)
@@ -14,6 +16,50 @@ drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1) # Ajustar co
 # Crear un objeto donde almacenarmos la malla facial
 mp_face_mesh = mp.solutions.face_mesh # Llamar a la funcion de la malla facial
 face_mesh = mp_face_mesh.FaceMesh(max_num_faces=1) # Crear el objeto (ctrl+click)
+
+#paths
+angry = os.path.join("c:\\Users\\edujr\\OneDrive\\Documentos\\emotion\\facial-emotion", "angry.png")
+happy = os.path.join("c:\\Users\\edujr\\OneDrive\\Documentos\\emotion\\facial-emotion", "happy.png")
+waos = os.path.join("c:\\Users\\edujr\\OneDrive\\Documentos\\emotion\\facial-emotion", "asombro.png")
+sad = os.path.join("c:\\Users\\edujr\\OneDrive\\Documentos\\emotion\\facial-emotion", "sad.png")
+
+# Cargar las imágenes de las emociones
+img_enojada = cv2.imread(angry, cv2.IMREAD_UNCHANGED)
+img_feliz = cv2.imread(happy, cv2.IMREAD_UNCHANGED)
+img_sorprendida = cv2.imread(waos, cv2.IMREAD_UNCHANGED)
+img_triste = cv2.imread(sad, cv2.IMREAD_UNCHANGED)
+
+
+
+def overlay_image_alpha(img, img_overlay, x, y, alpha_mask):
+    """ Overlay img_overlay on top of img at (x, y) with alpha mask. """
+    # Image ranges
+    y1, y2 = max(0, y), min(img.shape[0], y + img_overlay.shape[0])
+    x1, x2 = max(0, x), min(img.shape[1], x + img_overlay.shape[1])
+
+    # Overlay ranges
+    y1o, y2o = max(0, -y), min(img_overlay.shape[0], img.shape[0] - y)
+    x1o, x2o = max(0, -x), min(img_overlay.shape[1], img.shape[1] - x)
+
+    # Exit if nothing to do
+    if y1 >= y2 or x1 >= x2 or y1o >= y2o or x1o >= x2o:
+        return
+
+    # Blend overlay within the determined ranges
+    img_crop = img[y1:y2, x1:x2]
+
+    # Ensure img_crop has 4 channels
+    if img_crop.shape[2] == 3:
+        img_crop = cv2.cvtColor(img_crop, cv2.COLOR_BGR2BGRA)
+
+    img_overlay_crop = img_overlay[y1o:y2o, x1o:x2o]
+    alpha = alpha_mask[y1o:y2o, x1o:x2o, None] / 255.0
+    alpha_inv = 1.0 - alpha
+
+    img_crop[:] = alpha * img_overlay_crop + alpha_inv * img_crop
+
+    # Convert img_crop back to 3 channels if needed
+    img[y1:y2, x1:x2] = cv2.cvtColor(img_crop, cv2.COLOR_BGRA2BGR)
 
 # Crear el while principal
 while True:
@@ -71,16 +117,16 @@ while True:
                     # Clasificacion
                     # Persona Enojada
                     if longitud1 < 19 and longitud2 < 19 and longitud3 > 80 and longitud3 < 95 and longitud4 < 5:
-                        cv2.putText(frame, "Persona Enojada", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+                        overlay_image_alpha(frame, img_enojada, 480, 80, img_enojada[:, :, 3])
                     # Persona Feliz
                     elif longitud1 > 20 and longitud1 < 30 and longitud2 > 20 and longitud2 < 30 and longitud3 > 109 and longitud4 > 10 and longitud4 < 20:
-                        cv2.putText(frame, "Persona Feliz", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
+                        overlay_image_alpha(frame, img_feliz, 480, 80, img_feliz[:, :, 3])
                     # Persona Sorprendida
                     elif longitud1 > 35 and longitud2 > 35 and longitud3 > 85 and longitud3 < 90 and longitud4 > 20:
-                        cv2.putText(frame, "Persona Sorprendida", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 3)
+                        overlay_image_alpha(frame, img_sorprendida, 480, 80, img_sorprendida[:, :, 3])
                     # Persona Triste
                     elif longitud1 > 20 and longitud1 < 35 and longitud2 > 20 and longitud2 < 35 and longitud3 > 90 and longitud3 < 95 and longitud4 < 5:
-                        cv2.putText(frame, "Persona Triste", (480, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3)
+                        overlay_image_alpha(frame, img_triste, 480, 80, img_triste[:, :, 3])
                         
     cv2.imshow("Intensamente 2D", frame)
     t = cv2.waitKey(1)
